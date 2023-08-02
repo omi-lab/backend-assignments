@@ -1,0 +1,62 @@
+version: "3.5"
+services:
+  nsqlookupd:
+    image: nsqio/nsq:v1.2.1
+    command: /nsqlookupd
+    ports:
+      - "4160:4160"
+      - "4161:4161"
+    expose:
+      - "4160"
+      - "4161"
+    networks:
+      - nsq
+    restart: unless-stopped
+  nsqd:
+    image: nsqio/nsq:v1.2.1
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4150:4150"
+      - "4151:4151"
+    expose:
+      - "4150"
+      - "4151"
+    networks:
+      - nsq
+    restart: unless-stopped
+  nsqadmin:
+    image: nsqio/nsq:v1.2.1
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "4171:4171"
+    expose:
+      - "4171"
+    networks:
+      - nsq
+    restart: unless-stopped
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    networks:
+      - nsq
+    restart: unless-stopped
+
+volumes:
+  postgres:
+
+networks:
+  nsq:
+    name: nsq
