@@ -8,6 +8,7 @@ import (
 	"github.com/hugovantighem/backend-assignments/placeholderapi/app"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/infra/broker"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type Api struct{}
@@ -31,6 +32,8 @@ func (x Api) Logging(ctx echo.Context) error {
 
 	// response
 	if err != nil {
+		logrus.Errorf("Logging error: %v", err)
+
 		errStr := err.Error()
 		resp := api.Response{
 			Error: &errStr,

@@ -1,1 +1,1 @@
-curl -X POST 'http://localhost:8080/logging'
+curl -X POST -H "Content-Type: application/json" -d @logging-body.json 'http://localhost:8080/logging'
