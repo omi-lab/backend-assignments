@@ -25,7 +25,7 @@ func (x Api) Logging(ctx echo.Context) error {
 	}
 
 	// call usecase
-	emitter := broker.LogEmitter{}
+	emitter := broker.LogEmitter{} // TODO: use factory as attribute
 	uc := app.NewUseCase(emitter)
 	err := uc.AppendLog(context.Background(), cmd.Msg)
 
