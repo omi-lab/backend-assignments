@@ -1,0 +1,59 @@
+openapi: "3.0.0"
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+  /logging:
+    post:
+      operationId: logging
+      requestBody:
+        description: logging entry to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoggingCommand'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+components:
+  schemas:
+    Pong:
+      type: object
+      required:
+        - value  
+      properties:
+        value:
+          type: string
+    LoggingCommand:
+      type: object
+      required:
+        - msg  
+      properties:
+        msg:
+          type: string
+    LoggingResult:
+      type: object
+      required:
+        - result  
+      properties:
+        result:
+          type: string  
+    Response:
+      type: object
+      properties:
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/LoggingResult'
+        error:
+          type: string
