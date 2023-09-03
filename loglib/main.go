@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/nats-io/nats.go"
+	"github.com/sirupsen/logrus"
 )
 
 type LogEntry struct {
@@ -12,12 +13,14 @@ type LogEntry struct {
 }
 
 func Emit(entry LogEntry) error {
+	logrus.Debugf("Emitting: %s", entry.Message)
 
 	nc, err := nats.Connect("nats://nats:4222") // TODO: use vars / env vars
 
 	if err != nil {
 		return fmt.Errorf("connection failed: %w", err)
 	}
+	defer nc.Close()
 
 	b, err := json.Marshal(entry)
 
@@ -25,5 +28,11 @@ func Emit(entry LogEntry) error {
 		return fmt.Errorf("marshalling entry failed: %w", err)
 	}
 
-	return nc.Publish("foo", b)
+	err = nc.Publish("foo", b)
+
+	if err != nil {
+		return fmt.Errorf("Emit: %w", err)
+	}
+
+	return nil
 }
