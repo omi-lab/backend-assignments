@@ -15,7 +15,7 @@ func NewUseCase(emitter LogEmitter) *UseCase {
 
 func (x UseCase) AppendLog(ctx context.Context, msg string) error {
 	if len(msg) == 0 {
-		// some fake validation
+		// some validation
 		return fmt.Errorf("message should not be empty")
 	}
 	return x.emitter.Emit(ctx, msg)

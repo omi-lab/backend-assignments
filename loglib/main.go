@@ -1,6 +1,11 @@
 package loglib
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/nats-io/nats.go"
+)
 
 type LogEntry struct {
 	Message string
@@ -8,5 +13,17 @@ type LogEntry struct {
 
 func Emit(entry LogEntry) error {
 
-	return fmt.Errorf("error")
+	nc, err := nats.Connect("nats://nats:4222") // TODO: use vars / env vars
+
+	if err != nil {
+		return fmt.Errorf("connection failed: %w", err)
+	}
+
+	b, err := json.Marshal(entry)
+
+	if err != nil {
+		return fmt.Errorf("marshalling entry failed: %w", err)
+	}
+
+	return nc.Publish("foo", b)
 }
