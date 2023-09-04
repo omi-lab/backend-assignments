@@ -29,6 +29,8 @@ github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904154702-d3706e
 github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904154702-d3706e3202e1/go.mod h1:5mVxh4t3XGeZ9LewPHZEg72CqYKjOZHiHpuOOtxpMS4=
 github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904160600-949e96b73d93 h1:JxBGO43KzS9aptjyV3XJYi66dD7/AZRgw0iPafEhogg=
 github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904160600-949e96b73d93/go.mod h1:5mVxh4t3XGeZ9LewPHZEg72CqYKjOZHiHpuOOtxpMS4=
+github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904225353-0f8bacf34b00 h1:MYpULobsYSyBUXnKHyX2tDyIHDceqbQ90vn0RNiuRfQ=
+github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904225353-0f8bacf34b00/go.mod h1:5mVxh4t3XGeZ9LewPHZEg72CqYKjOZHiHpuOOtxpMS4=
 github.com/invopop/yaml v0.2.0 h1:7zky/qH+O0DwAyoobXUqvVBwgBFRxKoQ/3FjcVpjTMY=
 github.com/invopop/yaml v0.2.0/go.mod h1:2XuRLgs/ouIrW3XNzuNj7J3Nvu/Dig5MXvbCEdiBN3Q=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
