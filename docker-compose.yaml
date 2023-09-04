@@ -12,7 +12,7 @@ services:
     build: ./loghub
     environment:
       BROKER_URL: nats://nats:4222
-      DB_CONN_STRING: postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable
+      DB_URL: postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable
     networks:
       - nats
   migrate:
