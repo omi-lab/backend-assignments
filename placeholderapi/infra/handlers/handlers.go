@@ -17,7 +17,7 @@ type Api struct {
 	brokerParams loglib.BrokerParams
 }
 
-func NewApi(brokerParams loglib.BrokerParams) (Api, error) {
+func NewApi(brokerParams loglib.BrokerParams) (api.ServerInterface, error) {
 	if err := brokerParams.Validate(); err != nil {
 		return Api{}, fmt.Errorf("wrong broker params: %w", err)
 	}

@@ -13,6 +13,7 @@ type LogEmitter struct {
 	params loglib.BrokerParams
 }
 
+// NewLogEmitter creates a LogEmitter for the given broker params.
 func NewLogEmitter(params loglib.BrokerParams) app.LogEmitter {
 	return LogEmitter{
 		params: params,
