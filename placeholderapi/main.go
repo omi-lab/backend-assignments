@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/hugovantighem/backend-assignments/loglib"
@@ -13,7 +12,6 @@ import (
 
 func main() {
 
-	fmt.Println("set log level")
 	logrus.SetLevel(logrus.DebugLevel)
 
 	srv := echo.New()
@@ -26,7 +24,7 @@ func main() {
 
 	loggingApi, err := handlers.NewApi(brokerParams)
 	if err != nil {
-		logrus.Errorf("cannot build api: %w", err)
+		logrus.Errorf("cannot build api: %v", err)
 		return
 	}
 

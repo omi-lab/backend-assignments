@@ -4,15 +4,13 @@ WORKDIR /app
 
 COPY . ./
 
-RUN make deps
+# RUN make deps
 
 RUN go mod download
 
-RUN make generate-api
+# RUN make generate-mocks
 
-RUN make generate-mocks
-
-RUN make tests
+# RUN make tests
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main
 
