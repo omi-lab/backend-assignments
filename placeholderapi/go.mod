@@ -15,7 +15,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/google/uuid v1.3.1 // indirect
-	github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230903234310-12f359dfe85d // indirect
+	github.com/hugovantighem/backend-assignments/loglib v0.0.0-20230904154702-d3706e3202e1 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect

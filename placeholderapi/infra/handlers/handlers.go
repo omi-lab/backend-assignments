@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
+	"github.com/hugovantighem/backend-assignments/loglib"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/api"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/app"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/infra/broker"
@@ -11,7 +13,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Api struct{}
+type Api struct {
+	brokerParams loglib.BrokerParams
+}
+
+func NewApi(brokerParams loglib.BrokerParams) (Api, error) {
+	if err := brokerParams.Validate(); err != nil {
+		return Api{}, fmt.Errorf("wrong broker params: %w", err)
+	}
+	return Api{
+		brokerParams: brokerParams,
+	}, nil
+}
 
 func (x Api) Ping(ctx echo.Context) error {
 	result := api.Pong{Value: "pong"}
@@ -26,7 +39,7 @@ func (x Api) Accounts(ctx echo.Context, id string) error {
 	}
 
 	// call usecase
-	emitter := broker.LogEmitter{} // TODO: use factory as attribute
+	emitter := broker.NewLogEmitter(x.brokerParams)
 	uc := app.NewUseCase(emitter)
 	err := uc.AppendLog(context.Background(), id, cmd.Msg)
 
