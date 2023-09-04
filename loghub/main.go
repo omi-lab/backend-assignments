@@ -1,12 +1,13 @@
 package main
 
 import (
-	"log"
 	"os"
 	"runtime"
 
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	"github.com/nats-io/nats.go"
+	"github.com/hugovantighem/backend-assignments/loghub/domain"
+	"github.com/hugovantighem/backend-assignments/loghub/infra/broker"
+	"github.com/hugovantighem/backend-assignments/loghub/infra/db"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,11 +18,25 @@ func main() {
 	brokerUrl := os.Getenv("BROKER_URL")
 	brokerChannel := "log_entries"
 
-	nc, _ := nats.Connect(brokerUrl)
-	log.Println("Connected to " + brokerUrl)
-	_, _ = nc.Subscribe(brokerChannel, func(m *nats.Msg) {
-		log.Printf("Received a message on %s: %s\n", m.Subject, string(m.Data))
-	})
+	dbUrl := os.Getenv("DB_URL")
 
-	runtime.Goexit()
+	consumer, err := broker.NewConsumer(
+		brokerUrl,
+		brokerChannel,
+		func() domain.Repository {
+			return db.NewRepository(dbUrl)
+		},
+	)
+	if err != nil {
+		logrus.Error(err)
+		os.Exit(1)
+	}
+
+	err = consumer.Run()
+	if err != nil {
+		logrus.Error(err)
+		os.Exit(1)
+	}
+
+	runtime.Goexit() // TODO graceful shutdown
 }

@@ -30,6 +30,6 @@ func main() {
 
 	api.RegisterHandlers(srv, loggingApi)
 
-	srv.Logger.Fatal(srv.Start(":8080")) // TODO grace full shutdown
+	srv.Logger.Fatal(srv.Start(":8080")) // TODO graceful shutdown
 
 }
