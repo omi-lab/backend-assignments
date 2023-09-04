@@ -6,6 +6,3 @@ deps:
 
 tests:
 	go test -v ./...
-
-migrate:
-	TODO

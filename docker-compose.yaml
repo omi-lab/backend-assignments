@@ -2,8 +2,17 @@ version: "3.5"
 services:
   placeholderapi:
     build: ./placeholderapi
+    environment:
+      BROKER_URL: nats://nats:4222
     ports:
       - "8080:8080"
+    networks:
+      - nats
+  loghub:
+    build: ./loghub
+    environment:
+      BROKER_URL: nats://nats:4222
+      DB_CONN_STRING: postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable
     networks:
       - nats
   migrate:
