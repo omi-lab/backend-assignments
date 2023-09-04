@@ -21,13 +21,13 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// LoggingCommand defines model for LoggingCommand.
-type LoggingCommand struct {
+// AccountCommand defines model for AccountCommand.
+type AccountCommand struct {
 	Msg string `json:"msg"`
 }
 
-// LoggingResult defines model for LoggingResult.
-type LoggingResult struct {
+// AccountResult defines model for AccountResult.
+type AccountResult struct {
 	Result string `json:"result"`
 }
 
@@ -47,25 +47,25 @@ type Response_Result struct {
 	union json.RawMessage
 }
 
-// LoggingJSONRequestBody defines body for Logging for application/json ContentType.
-type LoggingJSONRequestBody = LoggingCommand
+// AccountsJSONRequestBody defines body for Accounts for application/json ContentType.
+type AccountsJSONRequestBody = AccountCommand
 
-// AsLoggingResult returns the union data inside the Response_Result as a LoggingResult
-func (t Response_Result) AsLoggingResult() (LoggingResult, error) {
-	var body LoggingResult
+// AsAccountResult returns the union data inside the Response_Result as a AccountResult
+func (t Response_Result) AsAccountResult() (AccountResult, error) {
+	var body AccountResult
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromLoggingResult overwrites any union data inside the Response_Result as the provided LoggingResult
-func (t *Response_Result) FromLoggingResult(v LoggingResult) error {
+// FromAccountResult overwrites any union data inside the Response_Result as the provided AccountResult
+func (t *Response_Result) FromAccountResult(v AccountResult) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeLoggingResult performs a merge with any union data inside the Response_Result, using the provided LoggingResult
-func (t *Response_Result) MergeLoggingResult(v LoggingResult) error {
+// MergeAccountResult performs a merge with any union data inside the Response_Result, using the provided AccountResult
+func (t *Response_Result) MergeAccountResult(v AccountResult) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -159,17 +159,17 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// LoggingWithBody request with any body
-	LoggingWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AccountsWithBody request with any body
+	AccountsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Logging(ctx context.Context, body LoggingJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Accounts(ctx context.Context, id string, body AccountsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Ping request
 	Ping(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) LoggingWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLoggingRequestWithBody(c.Server, contentType, body)
+func (c *Client) AccountsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsRequestWithBody(c.Server, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (c *Client) LoggingWithBody(ctx context.Context, contentType string, body i
 	return c.Client.Do(req)
 }
 
-func (c *Client) Logging(ctx context.Context, body LoggingJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLoggingRequest(c.Server, body)
+func (c *Client) Accounts(ctx context.Context, id string, body AccountsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountsRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -204,27 +204,34 @@ func (c *Client) Ping(ctx context.Context, reqEditors ...RequestEditorFn) (*http
 	return c.Client.Do(req)
 }
 
-// NewLoggingRequest calls the generic Logging builder with application/json body
-func NewLoggingRequest(server string, body LoggingJSONRequestBody) (*http.Request, error) {
+// NewAccountsRequest calls the generic Accounts builder with application/json body
+func NewAccountsRequest(server string, id string, body AccountsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLoggingRequestWithBody(server, "application/json", bodyReader)
+	return NewAccountsRequestWithBody(server, id, "application/json", bodyReader)
 }
 
-// NewLoggingRequestWithBody generates requests for Logging with any type of body
-func NewLoggingRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewAccountsRequestWithBody generates requests for Accounts with any type of body
+func NewAccountsRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/logging")
+	operationPath := fmt.Sprintf("/accounts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -234,7 +241,7 @@ func NewLoggingRequestWithBody(server string, contentType string, body io.Reader
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), body)
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -314,23 +321,23 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// LoggingWithBodyWithResponse request with any body
-	LoggingWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoggingResponse, error)
+	// AccountsWithBodyWithResponse request with any body
+	AccountsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsResponse, error)
 
-	LoggingWithResponse(ctx context.Context, body LoggingJSONRequestBody, reqEditors ...RequestEditorFn) (*LoggingResponse, error)
+	AccountsWithResponse(ctx context.Context, id string, body AccountsJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsResponse, error)
 
 	// PingWithResponse request
 	PingWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PingResponse, error)
 }
 
-type LoggingResponse struct {
+type AccountsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Response
 }
 
 // Status returns HTTPResponse.Status
-func (r LoggingResponse) Status() string {
+func (r AccountsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -338,7 +345,7 @@ func (r LoggingResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r LoggingResponse) StatusCode() int {
+func (r AccountsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -367,21 +374,21 @@ func (r PingResponse) StatusCode() int {
 	return 0
 }
 
-// LoggingWithBodyWithResponse request with arbitrary body returning *LoggingResponse
-func (c *ClientWithResponses) LoggingWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoggingResponse, error) {
-	rsp, err := c.LoggingWithBody(ctx, contentType, body, reqEditors...)
+// AccountsWithBodyWithResponse request with arbitrary body returning *AccountsResponse
+func (c *ClientWithResponses) AccountsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AccountsResponse, error) {
+	rsp, err := c.AccountsWithBody(ctx, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseLoggingResponse(rsp)
+	return ParseAccountsResponse(rsp)
 }
 
-func (c *ClientWithResponses) LoggingWithResponse(ctx context.Context, body LoggingJSONRequestBody, reqEditors ...RequestEditorFn) (*LoggingResponse, error) {
-	rsp, err := c.Logging(ctx, body, reqEditors...)
+func (c *ClientWithResponses) AccountsWithResponse(ctx context.Context, id string, body AccountsJSONRequestBody, reqEditors ...RequestEditorFn) (*AccountsResponse, error) {
+	rsp, err := c.Accounts(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseLoggingResponse(rsp)
+	return ParseAccountsResponse(rsp)
 }
 
 // PingWithResponse request returning *PingResponse
@@ -393,15 +400,15 @@ func (c *ClientWithResponses) PingWithResponse(ctx context.Context, reqEditors .
 	return ParsePingResponse(rsp)
 }
 
-// ParseLoggingResponse parses an HTTP response from a LoggingWithResponse call
-func ParseLoggingResponse(rsp *http.Response) (*LoggingResponse, error) {
+// ParseAccountsResponse parses an HTTP response from a AccountsWithResponse call
+func ParseAccountsResponse(rsp *http.Response) (*AccountsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &LoggingResponse{
+	response := &AccountsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -448,8 +455,8 @@ func ParsePingResponse(rsp *http.Response) (*PingResponse, error) {
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (POST /logging)
-	Logging(ctx echo.Context) error
+	// (PATCH /accounts/{id})
+	Accounts(ctx echo.Context, id string) error
 
 	// (GET /ping)
 	Ping(ctx echo.Context) error
@@ -460,12 +467,19 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// Logging converts echo context to params.
-func (w *ServerInterfaceWrapper) Logging(ctx echo.Context) error {
+// Accounts converts echo context to params.
+func (w *ServerInterfaceWrapper) Accounts(ctx echo.Context) error {
 	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.Logging(ctx)
+	err = w.Handler.Accounts(ctx, id)
 	return err
 }
 
@@ -506,7 +520,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.POST(baseURL+"/logging", wrapper.Logging)
+	router.PATCH(baseURL+"/accounts/:id", wrapper.Accounts)
 	router.GET(baseURL+"/ping", wrapper.Ping)
 
 }
@@ -514,12 +528,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/7SSQW/iMBCF/wqa3WNEot2bj+2pUqUiroiDGw/GKJlxx04lhPLfKzsJ0BK1PbS+YA3P",
-	"X968mRPU3HompBhAnSDUe2x1vj6ytY7sPbetJpMqXtijRIf5/zbY9BOPHkFBiOLIQt8XIPjSOUEDapNF",
-	"22IS8fMB6wh9McHXGLom3rLlXP8cP+rmvrBisrfgV910+DV3kM1h1xg8U8BbNIqwzKCLq26Y8GkHanOC",
-	"v4I7UPCnvORfjuGX78Ppt8ndByOp5GjHoKhrmgLYI2nvQMH/ZbWsoACv4z77KpsBlx1zGHx4FB0d04MB",
-	"NQ0DhgwwxDs2xySrmSJSfqG9b1yd35SHwHRZlnT7RjfTHmXrBkMtzicaKBgNLpCiHBeRF9oYuB5IlA6H",
-	"HHP2ua1/VfVjFs9D7YdTQOnHxCzOBLaa0volP3l3++m8BQAA///Oo7IUpAMAAA==",
+	"H4sIAAAAAAAC/7STMY/UMBCF/8pqoLQuK+jcARUVp2tPWxh7kvUpmTHjCdIqyn9HdjbHLomAAtwkGr88",
+	"f34zmcDzkJiQNIOdIPszDq6+fvCeR9JPPAyOQqkk4YSiEev+kLvy0EtCsJBVInUwzwYEv41RMIB9rqKT",
+	"WUX89QW9wmxW8yfMY69bb3mt/97+qts74ZGp2xp/d/2If/ZdZHu2T5gTU8atNYqw7Fibm9sw4ZcW7PME",
+	"bwVbsPCm+Zl/cw2/uQ9nPhW6X0BKKVLLYGnsewOckFyKYOH9w/HhCAaS03Platxil5sphrlyO/XnipNQ",
+	"nEamzwHs2pNcPxY3oKLkChswe4mpKMGC88pyiAFJYxtRoKCArSeCAXJDIY0BbjNVGdFcx2sv/9Mixqwf",
+	"OVyKwjMpUo3NpdRHX0mbl1wgphurv4hyHeKa2/1teu66SN0BSeVyUD64sCVfmlgbXzN9dzz+M8TXiZqX",
+	"ZaBJcZndDnXbpsey+R956o8zr+tHAAAA//+woQY1IQQAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

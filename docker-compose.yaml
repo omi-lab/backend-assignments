@@ -6,6 +6,15 @@ services:
       - "8080:8080"
     networks:
       - nats
+  migrate:
+    image: migrate/migrate
+    networks:
+      - nats
+    volumes:
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable", "up", "3"]
+    links: 
+      - postgres
   nats:
     image: nats:2.9.20
     ports:
