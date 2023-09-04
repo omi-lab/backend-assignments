@@ -9,16 +9,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Pong'
-  /logging:
-    post:
-      operationId: logging
+  /accounts/{id}:
+    patch:
+      operationId: accounts
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: actor identifier
       requestBody:
         description: logging entry to add
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoggingCommand'
+              $ref: '#/components/schemas/AccountCommand'
       responses:
         '200':
           content:
@@ -35,14 +42,14 @@ components:
       properties:
         value:
           type: string
-    LoggingCommand:
+    AccountCommand:
       type: object
       required:
         - msg  
       properties:
         msg:
           type: string
-    LoggingResult:
+    AccountResult:
       type: object
       required:
         - result  
@@ -54,6 +61,6 @@ components:
       properties:
         result:
           oneOf:
-            - $ref: '#/components/schemas/LoggingResult'
+            - $ref: '#/components/schemas/AccountResult'
         error:
           type: string

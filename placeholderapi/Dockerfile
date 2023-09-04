@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /main
 
 FROM build-stage AS run-test-stage
 
-RUN go test -v ./...
+RUN make tests
 
 FROM gcr.io/distroless/base-debian11 AS build-release-stage
 

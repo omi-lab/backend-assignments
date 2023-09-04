@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/app"
 	"github.com/hugovantighem/backend-assignments/placeholderapi/app/mocks"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestAppendLog(t *testing.T) {
 			msg := ""
 			// WHEN AppendLog
 			uc := app.NewUseCase(nil)
-			err := uc.AppendLog(context.Background(), msg)
+			err := uc.AppendLog(context.Background(), uuid.NewString(), msg)
 			// THEN an error is returned
 			assert.Error(t, err)
 		})
@@ -26,12 +27,13 @@ func TestAppendLog(t *testing.T) {
 			// setup
 			ctrl := gomock.NewController(t)
 			emitter := mocks.NewMockLogEmitter(ctrl)
-			emitter.EXPECT().Emit(gomock.Any(), gomock.Any()).Return(fmt.Errorf("error"))
+			emitter.EXPECT().Emit(gomock.Any(), gomock.Any(), gomock.Any()).
+				Return(fmt.Errorf("error"))
 			// GIVEN a valid message
 			msg := "foo"
 			// WHEN AppendLog
 			uc := app.NewUseCase(emitter)
-			err := uc.AppendLog(context.Background(), msg)
+			err := uc.AppendLog(context.Background(), uuid.NewString(), msg)
 			// THEN an error is returned
 			assert.Error(t, err)
 		})
@@ -40,12 +42,13 @@ func TestAppendLog(t *testing.T) {
 		// setup
 		ctrl := gomock.NewController(t)
 		emitter := mocks.NewMockLogEmitter(ctrl)
-		emitter.EXPECT().Emit(gomock.Any(), gomock.Any()).Return(nil)
+		emitter.EXPECT().Emit(gomock.Any(), gomock.Any(), gomock.Any()).
+			Return(nil)
 		// GIVEN a valid message
 		msg := "foo"
 		// WHEN AppendLog
 		uc := app.NewUseCase(emitter)
-		err := uc.AppendLog(context.Background(), msg)
+		err := uc.AppendLog(context.Background(), uuid.NewString(), msg)
 		// THEN no error is returned
 		assert.NoError(t, err)
 	})

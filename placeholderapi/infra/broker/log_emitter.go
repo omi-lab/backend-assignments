@@ -3,6 +3,7 @@ package broker
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hugovantighem/backend-assignments/loglib"
 )
@@ -10,9 +11,11 @@ import (
 type LogEmitter struct {
 }
 
-func (x LogEmitter) Emit(ctx context.Context, msg string) error {
+func (x LogEmitter) Emit(ctx context.Context, actor string, msg string) error {
 	entry := loglib.LogEntry{
-		Message: msg,
+		Actor:     actor,
+		Action:    msg,
+		OccuredAt: time.Now(),
 	}
 	err := loglib.Emit(entry)
 	if err != nil {

@@ -10,7 +10,7 @@ import (
 func TestEmit(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 
-	err := Emit(LogEntry{Message: "test"})
+	err := Emit(LogEntry{Action: "test"})
 
 	assert.NoError(t, err)
 

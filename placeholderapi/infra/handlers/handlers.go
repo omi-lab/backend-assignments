@@ -18,9 +18,9 @@ func (x Api) Ping(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (x Api) Logging(ctx echo.Context) error {
+func (x Api) Accounts(ctx echo.Context, id string) error {
 	// parse request
-	cmd := &api.LoggingCommand{}
+	cmd := &api.AccountCommand{}
 	if err := ctx.Bind(cmd); err != nil {
 		return err
 	}
@@ -28,11 +28,11 @@ func (x Api) Logging(ctx echo.Context) error {
 	// call usecase
 	emitter := broker.LogEmitter{} // TODO: use factory as attribute
 	uc := app.NewUseCase(emitter)
-	err := uc.AppendLog(context.Background(), cmd.Msg)
+	err := uc.AppendLog(context.Background(), id, cmd.Msg)
 
 	// response
 	if err != nil {
-		logrus.Errorf("Logging error: %v", err)
+		logrus.Errorf("Accounts error: %v", err)
 
 		errStr := err.Error()
 		resp := api.Response{
@@ -42,7 +42,7 @@ func (x Api) Logging(ctx echo.Context) error {
 	}
 
 	result := api.Response_Result{}
-	result.FromLoggingResult(api.LoggingResult{Result: "ok"})
+	result.FromAccountResult(api.AccountResult{Result: "ok"})
 	resp := api.Response{
 		Result: &result,
 	}
