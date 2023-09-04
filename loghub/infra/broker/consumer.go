@@ -8,6 +8,7 @@ import (
 	"github.com/hugovantighem/backend-assignments/loghub/app"
 	"github.com/hugovantighem/backend-assignments/loghub/domain"
 	"github.com/hugovantighem/backend-assignments/loglib"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 )
@@ -15,13 +16,13 @@ import (
 type Consumer struct {
 	brokerUrl   string
 	channel     string
-	repoFactory func() domain.Repository
+	repoFactory func(ctx context.Context) (domain.Repository, *pgxpool.Conn, error)
 }
 
 func NewConsumer(
 	brokerUrl string,
 	channel string,
-	repoFactory func() domain.Repository,
+	repoFactory func(ctx context.Context) (domain.Repository, *pgxpool.Conn, error),
 ) (Consumer, error) {
 	if len(brokerUrl) == 0 {
 		return Consumer{}, fmt.Errorf("brokerUrl should not be empty")
@@ -54,13 +55,22 @@ func (x Consumer) Run() error {
 
 		err := json.Unmarshal(m.Data, &entry)
 		if err != nil {
+			logrus.Error("error while Unmarshal: %w", err)
 			return
 		}
 
-		repo := x.repoFactory()
+		ctx := context.Background()
 
-		err = app.HandleEntry(context.Background(), entry, repo)
+		repo, conn, err := x.repoFactory(ctx)
 		if err != nil {
+			logrus.Error("error calling repoFactory: %w", err)
+			return
+		}
+		defer conn.Release()
+
+		err = app.HandleEntry(ctx, entry, repo)
+		if err != nil {
+			logrus.Error("error calling HandleEntry: %w", err)
 			return
 		}
 	})

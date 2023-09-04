@@ -58,7 +58,12 @@ Write the dockerfiles to containerize both your systems.
 
 ### Running the system
 
-Once done, we expect you to update this section and describe how to start the system.
+From the root directory run:
+```
+make deploy
+```
+
+This will run services using docker compose.
 
 ## Bonus points (2 max.)
 
