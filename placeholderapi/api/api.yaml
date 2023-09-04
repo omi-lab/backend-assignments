@@ -1,0 +1,66 @@
+openapi: "3.0.0"
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+  /accounts/{id}:
+    patch:
+      operationId: accounts
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: actor identifier
+      requestBody:
+        description: logging entry to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCommand'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+components:
+  schemas:
+    Pong:
+      type: object
+      required:
+        - value  
+      properties:
+        value:
+          type: string
+    AccountCommand:
+      type: object
+      required:
+        - msg  
+      properties:
+        msg:
+          type: string
+    AccountResult:
+      type: object
+      required:
+        - result  
+      properties:
+        result:
+          type: string  
+    Response:
+      type: object
+      properties:
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/AccountResult'
+        error:
+          type: string

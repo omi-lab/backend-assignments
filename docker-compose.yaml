@@ -1,0 +1,62 @@
+version: "3.5"
+services:
+  placeholderapi:
+    build: ./placeholderapi
+    environment:
+      BROKER_URL: nats://nats:4222
+    ports:
+      - "8080:8080"
+    networks:
+      - nats
+  loghub:
+    build: ./loghub
+    environment:
+      BROKER_URL: nats://nats:4222
+      DB_URL: postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable
+    networks:
+      - nats
+    links: 
+      - nats
+      - postgres
+  migrate:
+    image: migrate/migrate
+    networks:
+      - nats
+    volumes:
+      - ./loghub/infra/db/migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://postgres:changeme@postgres:5432/postgres?sslmode=disable", "up", "3"]
+    links: 
+      - postgres
+  nats:
+    image: nats:2.9.20
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    expose:
+      - "8222"
+      - "4222"
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222"
+    networks:
+      - nats
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    networks:
+      - nats
+    restart: unless-stopped
+
+networks:
+  nats:
+    name: nats
+
+volumes:
+  postgres:
