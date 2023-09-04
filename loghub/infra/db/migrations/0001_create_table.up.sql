@@ -4,4 +4,4 @@ create table IF NOT EXISTS LOG_ENTRY(
     actor varchar(255) NOT NULL,
     action varchar(255) NOT NULL,
     occuredAt TIMESTAMPT NOT NULL
-)
+);
